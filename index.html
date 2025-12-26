@@ -1,472 +1,184 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>💬دردشة</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-<style>
-/* ⛔️ منع النسخ وتحديد النص */
-body {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none; 
-  -webkit-text-size-adjust: 100%; 
-  font-family: 'Tajawal', sans-serif;
-  background-color: #f0f2f5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  margin: 0;
-  direction: rtl;
-}
-
-.chat-container {
-  width: 100%;
-  max-width: 450px;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  display: flex;
-  flex-direction: column;
-  height: 95vh;
-  overflow: hidden;
-  transition: all 0.3s;
-}
-
-.chat-header {
-    background-color: #008069;
-    color: white;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1.2em;
-    font-weight: 700;
-}
-
-.chat-header .back-icon {
-    font-size: 1.3em;
-    cursor: pointer;
-    margin-right: 15px;
-}
-
-.header-icons {
-    display: flex;
-    order: 3;
-}
-
-.header-icons i {
-    cursor: pointer;
-    margin: 0 8px;
-    font-size: 1.1em;
-    transition: color 0.2s;
-}
-.header-icons i:hover {
-    color: #dcf8c6;
-}
-
-#messages {
-  flex-grow: 1;
-  overflow-y: auto;
-  padding: 10px;
-  background-image: url('https://user-images.githubusercontent.com/15075759/28719142-82550186-735e-11e7-827c-9b37c030d931.png');
-  background-size: cover;
-}
-
-.message {
-  margin: 5px 0;
-  padding: 10px 14px;
-  max-width: 85%;
-  border-radius: 10px;
-  word-wrap: break-word;
-  position: relative;
-  line-height: 1.4;
-  box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
-  cursor: pointer; 
-}
-
-.sender-name {
-    font-size: 0.8em;
-    font-weight: 700;
-    margin-bottom: 2px;
-    display: flex;
-    align-items: center;
-}
-
-.profile-pic {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    margin-left: 8px;
-    object-fit: cover;
-    background: #eee;
-}
-
-.message-text {
-    font-size: 1em;
-    display: block;
-    user-select: text;
-}
-
-.message-meta {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-top: 5px;
-}
-
-.message-time {
-    font-size: 0.7em;
-    color: rgba(0, 0, 0, 0.45);
-    margin-left: 5px;
-}
-
-.view-counter {
-    font-size: 0.7em;
-    color: #008069;
-    cursor: pointer;
-    margin-right: 5px;
-    display: flex;
-    align-items: center;
-}
-
-.status-unread { color: #aaa; }
-.status-read { color: #34b7f1; }
-
-.me { background-color: #dcf8c6; margin-right: auto; border-top-left-radius: 0; }
-.you { background-color: #ffffff; margin-left: auto; border-top-right-radius: 0; }
-
-.input-area {
-  display: flex;
-  padding: 10px;
-  background-color: #f6f6f6;
-  border-top: 1px solid #eee;
-}
-
-#msg {
-  flex-grow: 1;
-  padding: 10px 15px;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  margin-left: 8px;
-}
-
-#send-btn {
-  background-color: #008069;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 40px; height: 40px;
-  cursor: pointer;
-}
-
-.overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.8); display: none; justify-content: center; align-items: center; z-index: 1000;
-}
-
-.modal-box {
-    background: white; padding: 30px; border-radius: 10px;
-    text-align: center; width: 90%; max-width: 350px;
-}
-
-.modal-box input, .modal-box button { width: 100%; margin-top: 10px; padding: 12px; border-radius: 8px; box-sizing: border-box; }
-
-#private-notification-bar {
-    position: fixed; top: 65px; left: 50%; transform: translateX(-50%);
-    background-color: #008069; color: white; padding: 12px 20px;
-    border-radius: 8px; display: none; z-index: 2000; cursor: pointer;
-}
-
-.hidden { display: none !important; }
-</style>
-</head>
-
-<body onload="checkLocalUser()">
-
-<div id="name-prompt-overlay" class="overlay">
-    <div class="modal-box">
-        <h4>👋مرحبا في بك!</h4>
-        <input id="userNameInput" placeholder="ادخل اسمك">
-        
-        <div style="margin: 15px 0;">
-            <label for="profile-pic-input" style="cursor: pointer; color: #008069;">
-                <i class="fas fa-camera"></i> إضافة صورة شخصية (اختياري)
-            </label>
-            <input type="file" id="profile-pic-input" accept="image/*" class="hidden" onchange="uploadProfilePicture()">
-            <br>
-            <img id="profile-pic-preview" src="https://i.imgur.com/GgG4s0v.png" style="width: 70px; height: 70px; border-radius: 50%; margin-top: 10px; object-fit: cover; border: 2px solid #008069;">
-        </div>
-
-        <button onclick="setNameAndStart()" style="background: #008069; color: white; border: none;">ابدأ الآن</button>
-    </div>
-</div>
-
-<div class="chat-container hidden" id="chat-app">
-  <div class="chat-header">
-      <div style="display: flex; align-items: center;">
-          <i id="back-to-friends-icon" class="fas fa-arrow-right back-icon hidden" onclick="changeToGeneralChat()"></i> 
-          <div id="current-chat-title">الدردشة العامة</div>
-      </div>
-      <div class="header-icons">
-          <i id="notification-icon" class="fas fa-bell" onclick="showRequestsModal()"></i>
-          <i id="friends-icon" class="fas fa-users" onclick="showFriendsModal()"></i>
-          <i id="logout-icon" class="fas fa-sign-out-alt" onclick="promptLogout()"></i>
-      </div>
-  </div>
-  <div id="messages"></div>
-  <div class="input-area">
-    <input id="msg" placeholder="اكتب رسالة...">
-    <button id="send-btn" onclick="send()"><i class="fas fa-paper-plane"></i></button>
-  </div>
-</div>
-
-<div id="private-notification-bar" onclick="goToFriendChatFromNotification()">
-    <p><strong id="notif-sender"></strong>: <span id="notif-content"></span></p>
-</div>
-
-<audio id="notify"><source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
-
-<div id="friends-modal" class="overlay"><div class="modal-box"><h4>الأصدقاء</h4><div id="friends-list"></div><button onclick="closeModals()">إغلاق</button></div></div>
-<div id="requests-modal" class="overlay"><div class="modal-box"><h4>الطلبات</h4><div id="requests-list"></div><button onclick="closeModals()">إغلاق</button></div></div>
-<div id="user-options-modal" class="overlay"><div class="modal-box"><h4 id="target-user-name"></h4><button onclick="sendFriendRequest()" style="background: #34b7f1; color: white; border: none;">مراسلة خاصة</button><button onclick="closeModals()">إلغاء</button></div></div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, onValue, set, get, remove, off } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCSk-hxTN6kbpoVtbjV0_EQhfjUWcKcNAg",
-  authDomain: "chattest1-5a90d.firebaseapp.com",
-  databaseURL: "https://chattest1-5a90d-default-rtdb.firebaseio.com",
-  projectId: "chattest1-5a90d",
-  storageBucket: "chattest1-5a90d.appspot.com",
-  messagingSenderId: "1058900000158",
-  appId: "1:1058900000158:web:2eb5e504ceb47915ca6a8f"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const storage = getStorage(app);
-
-let myName = null;
-let currentChat = "GENERAL";
-let currentListeners = {};
-
-// 1. حل مشكلة تكرار التسجيل
-window.checkLocalUser = function() {
-    const storedName = localStorage.getItem('chat_username');
-    if (storedName) {
-        myName = storedName;
-        startChatApp();
-    } else {
-        document.getElementById('name-prompt-overlay').style.display = 'flex';
-    }
-};
-
-window.setNameAndStart = function() {
-    const nameInput = document.getElementById('userNameInput');
-    myName = nameInput.value.trim();
-    if (myName === "") return alert("الرجاء إدخال اسم.");
-    localStorage.setItem('chat_username', myName);
-    startChatApp();
-};
-
-async function startChatApp() {
-    document.getElementById('name-prompt-overlay').style.display = 'none';
-    document.getElementById('chat-app').classList.remove('hidden');
-    startListeningToGeneralChat();
-    startListeningToRequests();
-    startListeningToFriendMessages();
-}
-
-// 2. حل مشكلة الصورة الشخصية
-window.uploadProfilePicture = async function() {
-    const file = document.getElementById('profile-pic-input').files[0];
-    if (!file) return;
-
-    try {
-        const sPath = `profile_pics/${myName}`;
-        const mRef = storageRef(storage, sPath);
-        const snapshot = await uploadBytes(mRef, file);
-        const photoURL = await getDownloadURL(snapshot.ref);
-
-        await set(ref(db, `user_profiles/${myName}/photoURL`), photoURL);
-        document.getElementById('profile-pic-preview').src = photoURL;
-        localStorage.setItem('chat_user_photo', photoURL);
-        alert("تم تحديث الصورة!");
-    } catch (e) { alert("فشل الرفع"); }
-};
-
-async function getUserPic(name) {
-    const local = localStorage.getItem(`pic_${name}`);
-    if (local) return local;
-    const snap = await get(ref(db, `user_profiles/${name}/photoURL`));
-    const url = snap.exists() ? snap.val() : "https://i.imgur.com/GgG4s0v.png";
-    localStorage.setItem(`pic_${name}`, url);
-    return url;
-}
-
-// وظائف الدردشة
-window.send = () => {
-    const msgInput = document.getElementById("msg");
-    const text = msgInput.value.trim();
-    if (!text) return;
-
-    const path = currentChat === "GENERAL" ? "chats/general_room" : `chats/private_rooms/${currentChat}`;
-    push(ref(db, path), {
-        sender: myName, text: text,
-        time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now(), read: false
-    });
-    msgInput.value = "";
-};
-
-function startListeningToGeneralChat() {
-    onChildAdded(ref(db, "chats/general_room"), (snap) => {
-        if (currentChat === "GENERAL") displayMessage(snap.val(), snap.key);
-    });
-}
-
-async function displayMessage(data, key) {
-    const container = document.getElementById("messages");
-    const div = document.createElement("div");
-    div.className = `message ${data.sender === myName ? 'me' : 'you'}`;
-    const pic = await getUserPic(data.sender);
-
-    div.innerHTML = `
-        <div class="sender-name" onclick="window.showUserOptions('${data.sender}')">
-            <img src="${pic}" class="profile-pic"> ${data.sender === myName ? 'أنت' : data.sender}
-        </div>
-        <span class="message-text">${data.text}</span>
-        <div class="message-meta">
-            <span class="message-time">${data.time}</span>
-            ${currentChat !== "GENERAL" && data.sender === myName ? `<i class="fas fa-check-double ${data.read ? 'status-read' : 'status-unread'}"></i>` : ''}
-        </div>
-    `;
-    container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
-    if (currentChat !== "GENERAL" && data.sender !== myName) {
-        set(ref(db, `chats/private_rooms/${currentChat}/${key}/read`), true);
-    }
-}
-
-window.showUserOptions = async (name) => {
-    if (name === myName) return;
-    const friendSnap = await get(ref(db, `friends/${myName}/${name}`));
-    if (friendSnap.exists()) {
-        startPrivateChat(name, friendSnap.val());
-    } else {
-        document.getElementById('target-user-name').innerText = name;
-        document.getElementById('user-options-modal').style.display = 'flex';
-    }
-};
-
-window.sendFriendRequest = async () => {
-    const to = document.getElementById('target-user-name').innerText;
-    await push(ref(db, "requests"), { from: myName, to: to });
-    alert("تم إرسال طلب المراسلة");
-    closeModals();
-};
-
-function startListeningToRequests() {
-    onValue(ref(db, "requests"), (snap) => {
-        let has = false;
-        snap.forEach(r => { if(r.val().to === myName) has = true; });
-        document.getElementById('notification-icon').style.color = has ? 'red' : 'white';
-    });
-}
-
-window.showRequestsModal = async () => {
-    const list = document.getElementById('requests-list');
-    list.innerHTML = "";
-    const snap = await get(ref(db, "requests"));
-    snap.forEach(r => {
-        if (r.val().to === myName) {
-            const d = document.createElement("div");
-            d.innerHTML = `${r.val().from} <button onclick="acceptRequest('${r.val().from}', '${r.key}')">قبول</button>`;
-            list.appendChild(d);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قنوات Bein Sport</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ألوان هادئة ومريحة */
+        :root {
+            --bg-soft: #eef1f5; /* خلفية ناعمة */
+            --card-soft: #ffffff; /* لون بطاقة بيضاء */
+            --text-primary: #34495e; /* نص داكن هادئ */
+            --accent-blue: #4A69BD; /* لون التمييز الهادئ */
+            --shadow-deep: 0 10px 30px rgba(0, 0, 0, 0.15); 
+            --success-light: #2ecc71;
         }
-    });
-    document.getElementById('requests-modal').style.display = 'flex';
-};
+        
+        /* حركات أنيميشن جديدة */
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-window.acceptRequest = async (from, key) => {
-    const rId = push(ref(db, "chats/private_rooms")).key;
-    await set(ref(db, `friends/${myName}/${from}`), rId);
-    await set(ref(db, `friends/${from}/${myName}`), rId);
-    await remove(ref(db, `requests/${key}`));
-    closeModals();
-    startPrivateChat(from, rId);
-};
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 0 rgba(74, 105, 189, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(74, 105, 189, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(74, 105, 189, 0); }
+        }
 
-window.showFriendsModal = async () => {
-    const list = document.getElementById('friends-list');
-    list.innerHTML = "";
-    const snap = await get(ref(db, `friends/${myName}`));
-    snap.forEach(f => {
-        const d = document.createElement("div");
-        d.className = "modal-list-item";
-        d.innerText = f.key;
-        d.onclick = () => startPrivateChat(f.key, f.val());
-        list.appendChild(d);
-    });
-    document.getElementById('friends-modal').style.display = 'flex';
-};
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background: var(--bg-soft); 
+            color: var(--text-primary); 
+            text-align: center; 
+            padding: 20px; 
+            direction: rtl; 
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+        }
 
-function startPrivateChat(name, rId) {
-    currentChat = rId;
-    document.getElementById('current-chat-title').innerText = name;
-    document.getElementById('back-to-friends-icon').classList.remove('hidden');
-    document.getElementById('messages').innerHTML = "";
-    closeModals();
-    onChildAdded(ref(db, `chats/private_rooms/${rId}`), (snap) => {
-        if (currentChat === rId) displayMessage(snap.val(), snap.key);
-    });
-}
+        .container { 
+            max-width: 500px; 
+            width: 100%;
+            padding: 30px; 
+            background: var(--card-soft); 
+            border-radius: 20px; 
+            box-shadow: var(--shadow-deep); 
+            animation: slideInUp 0.8s ease-out;
+            box-sizing: border-box;
+        }
+        
+        h1 { 
+            color: var(--accent-blue); 
+            margin-bottom: 30px; 
+            font-size: 2rem;
+            border-bottom: 3px solid var(--accent-blue);
+            padding-bottom: 10px;
+            display: inline-block;
+            font-weight: 700;
+        }
+        
+        .channel-list { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            margin-top: 20px;
+        }
+        
+        /* تصميم القالب الجميل للقناة */
+        .channel-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--accent-blue); 
+            color: white; 
+            padding: 18px 25px; 
+            border-radius: 12px; 
+            text-decoration: none; 
+            font-size: 1.2rem; 
+            font-weight: 600; 
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); 
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border-bottom: 4px solid #3757a3;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            animation: slideInUp 0.6s forwards;
+        }
 
-window.changeToGeneralChat = () => {
-    currentChat = "GENERAL";
-    document.getElementById('current-chat-title').innerText = "الدردشة العامة";
-    document.getElementById('back-to-friends-icon').classList.add('hidden');
-    document.getElementById('messages').innerHTML = "";
-    startListeningToGeneralChat();
-};
+        .channel-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1) 50%, transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s;
+        }
 
-window.closeModals = () => {
-    document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none');
-};
+        .channel-link:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .channel-link:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2), 0 0 20px var(--success-light);
+            border-bottom-color: var(--success-light);
+        }
+        
+        .channel-link:active { 
+            transform: translateY(1px); 
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            border-bottom-width: 2px;
+        }
+        
+        .channel-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+        
+        .channel-link:hover .channel-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .note {
+            margin-top: 40px; 
+            font-size: 0.95rem; 
+            color: #7f8c8d;
+            padding: 10px;
+            border-top: 1px dashed #ccc;
+            animation: fadeIn 1s forwards 0.5s;
+            opacity: 0;
+        }
 
-window.promptLogout = () => {
-    if(confirm("تسجيل خروج؟")) { localStorage.clear(); location.reload(); }
-};
-
-function startListeningToFriendMessages() {
-    onValue(ref(db, `friends/${myName}`), (snap) => {
-        snap.forEach(f => {
-            onChildAdded(ref(db, `chats/private_rooms/${f.val()}`), (m) => {
-                if (m.val().sender !== myName && !m.val().read) {
-                    showNotif(m.val().sender, m.val().text);
-                }
-            });
-        });
-    });
-}
-
-function showNotif(s, t) {
-    document.getElementById('notif-sender').innerText = s;
-    document.getElementById('notif-content').innerText = t;
-    document.getElementById('private-notification-bar').style.display = 'block';
-    document.getElementById('notify').play();
-    setTimeout(() => document.getElementById('private-notification-bar').style.display = 'none', 4000);
-}
-</script>
+        @media (max-width: 600px) { 
+            body { align-items: flex-start; }
+            .container { margin: 20px auto; padding: 20px; }
+            .channel-link { padding: 15px 20px; font-size: 1.1rem; }
+            h1 { font-size: 1.6rem; margin-bottom: 20px; }
+        }
+        
+        /* يجب إضافة خاصية fadeIn من الكود الأصلي ليعمل الـ animation-delay بشكل صحيح */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>قنوات <span style="color: var(--success-light);">الوان الرياضية</span></h1>
+        <div class="channel-list">
+            <a href="https://py.dencreak.com/alwan_hd1.m3u8" target="_self" class="channel-link" style="animation-delay: 0s;">
+                <span class="channel-name">قناة 1</span>
+                <span class="channel-icon">📺</span>
+            </a>
+            <a href="https://py.dencreak.com/alwan_hd2.m3u8" target="_self" class="channel-link" style="animation-delay: 0.1s;">
+                <span class="channel-name">قناة 2</span>
+                <span class="channel-icon">📺</span>
+            </a>
+            <a href="https://py.dencreak.com/alwan_hd3.m3u8" target="_self" class="channel-link" style="animation-delay: 0.2s;">
+                <span class="channel-name">قناة 3</span>
+                <span class="channel-icon">📺</span>
+            </a>
+            <a href="https://py.dencreak.com/alwan_hd4.m3u8" target="_self" class="channel-link" style="animation-delay: 0.3s;">
+                <span class="channel-name">قناة 4</span>
+                <span class="channel-icon">📺</span>
+            </a>
+            <a href="https://py.dencreak.com/alwan_hd5.m3u8" target="_self" class="channel-link" style="animation-delay: 0.4s;">
+                <span class="channel-name">قناة 5</span>
+                <span class="channel-icon">📺</span>
+            </a>
+        </div>
+        <p class="note">ملاحظة: القنوات تعمل في حال وجود حدث رياضي. يرجى اختيار القناة.</p>
+    </div>
 </body>
 </html>
