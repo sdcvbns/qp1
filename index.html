@@ -1,184 +1,40 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قنوات Bein Sport</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* ألوان هادئة ومريحة */
-        :root {
-            --bg-soft: #eef1f5; /* خلفية ناعمة */
-            --card-soft: #ffffff; /* لون بطاقة بيضاء */
-            --text-primary: #34495e; /* نص داكن هادئ */
-            --accent-blue: #4A69BD; /* لون التمييز الهادئ */
-            --shadow-deep: 0 10px 30px rgba(0, 0, 0, 0.15); 
-            --success-light: #2ecc71;
-        }
-        
-        /* حركات أنيميشن جديدة */
-        @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+<meta charset="UTF-8">
+<title>مشغل بث مباشر</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        @keyframes highlightPulse {
-            0% { box-shadow: 0 0 0 0 rgba(74, 105, 189, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(74, 105, 189, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(74, 105, 189, 0); }
-        }
-
-        body { 
-            font-family: 'Cairo', sans-serif; 
-            background: var(--bg-soft); 
-            color: var(--text-primary); 
-            text-align: center; 
-            padding: 20px; 
-            direction: rtl; 
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-sizing: border-box;
-        }
-
-        .container { 
-            max-width: 500px; 
-            width: 100%;
-            padding: 30px; 
-            background: var(--card-soft); 
-            border-radius: 20px; 
-            box-shadow: var(--shadow-deep); 
-            animation: slideInUp 0.8s ease-out;
-            box-sizing: border-box;
-        }
-        
-        h1 { 
-            color: var(--accent-blue); 
-            margin-bottom: 30px; 
-            font-size: 2rem;
-            border-bottom: 3px solid var(--accent-blue);
-            padding-bottom: 10px;
-            display: inline-block;
-            font-weight: 700;
-        }
-        
-        .channel-list { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-            margin-top: 20px;
-        }
-        
-        /* تصميم القالب الجميل للقناة */
-        .channel-link {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--accent-blue); 
-            color: white; 
-            padding: 18px 25px; 
-            border-radius: 12px; 
-            text-decoration: none; 
-            font-size: 1.2rem; 
-            font-weight: 600; 
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); 
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            border-bottom: 4px solid #3757a3;
-            position: relative;
-            overflow: hidden;
-            opacity: 0;
-            animation: slideInUp 0.6s forwards;
-        }
-
-        .channel-link::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1) 50%, transparent);
-            transform: translateX(-100%);
-            transition: transform 0.5s;
-        }
-
-        .channel-link:hover::before {
-            transform: translateX(100%);
-        }
-        
-        .channel-link:hover { 
-            transform: translateY(-3px); 
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2), 0 0 20px var(--success-light);
-            border-bottom-color: var(--success-light);
-        }
-        
-        .channel-link:active { 
-            transform: translateY(1px); 
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-            border-bottom-width: 2px;
-        }
-        
-        .channel-icon {
-            font-size: 1.5rem;
-            transition: transform 0.3s;
-        }
-        
-        .channel-link:hover .channel-icon {
-            transform: scale(1.1) rotate(5deg);
-        }
-        
-        .note {
-            margin-top: 40px; 
-            font-size: 0.95rem; 
-            color: #7f8c8d;
-            padding: 10px;
-            border-top: 1px dashed #ccc;
-            animation: fadeIn 1s forwards 0.5s;
-            opacity: 0;
-        }
-
-        @media (max-width: 600px) { 
-            body { align-items: flex-start; }
-            .container { margin: 20px auto; padding: 20px; }
-            .channel-link { padding: 15px 20px; font-size: 1.1rem; }
-            h1 { font-size: 1.6rem; margin-bottom: 20px; }
-        }
-        
-        /* يجب إضافة خاصية fadeIn من الكود الأصلي ليعمل الـ animation-delay بشكل صحيح */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-    </style>
+<style>
+body {
+    margin: 0;
+    background: black;
+}
+video {
+    width: 100vw;
+    height: 100vh;
+    background: black;
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>قنوات <span style="color: var(--success-light);">الوان الرياضية</span></h1>
-        <div class="channel-list">
-            <a href="https://py.dencreak.com/alwan_hd1.m3u8" target="_self" class="channel-link" style="animation-delay: 0s;">
-                <span class="channel-name">قناة 1</span>
-                <span class="channel-icon">📺</span>
-            </a>
-            <a href="https://py.dencreak.com/alwan_hd2.m3u8" target="_self" class="channel-link" style="animation-delay: 0.1s;">
-                <span class="channel-name">قناة 2</span>
-                <span class="channel-icon">📺</span>
-            </a>
-            <a href="https://py.dencreak.com/alwan_hd3.m3u8" target="_self" class="channel-link" style="animation-delay: 0.2s;">
-                <span class="channel-name">قناة 3</span>
-                <span class="channel-icon">📺</span>
-            </a>
-            <a href="https://py.dencreak.com/alwan_hd4.m3u8" target="_self" class="channel-link" style="animation-delay: 0.3s;">
-                <span class="channel-name">قناة 4</span>
-                <span class="channel-icon">📺</span>
-            </a>
-            <a href="https://py.dencreak.com/alwan_hd5.m3u8" target="_self" class="channel-link" style="animation-delay: 0.4s;">
-                <span class="channel-name">قناة 5</span>
-                <span class="channel-icon">📺</span>
-            </a>
-        </div>
-        <p class="note">ملاحظة: القنوات تعمل في حال وجود حدث رياضي. يرجى اختيار القناة.</p>
-    </div>
+
+<video id="video" controls autoplay muted></video>
+
+<script src="https://cdn.jsdelivr.net/npm/mpegts.js@1.7.3/dist/mpegts.min.js"></script>
+<script>
+if (mpegts.getFeatureList().mseLivePlayback) {
+    const video = document.getElementById('video');
+    const player = mpegts.createPlayer({
+        type: 'mpegts',
+        isLive: true,
+        url: 'https://stream.supertv.gg:3001/supertv/sport/stv1/ch1/ch1_108011618250.ts'
+    });
+    player.attachMediaElement(video);
+    player.load();
+    player.play();
+}
+</script>
+
 </body>
 </html>
